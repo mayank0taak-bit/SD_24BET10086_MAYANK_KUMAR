@@ -1,0 +1,96 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="URL Shortener HLD" id="hld1">
+    <mxGraphModel dx="1400" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- Requirement boxes -->
+        <mxCell id="fr" value="&lt;b&gt;Functional Requirements&lt;/b&gt;&lt;br&gt;&lt;br&gt;• Shorten a long URL&lt;br&gt;• Redirect short URL to original&lt;br&gt;• Store URL mapping&lt;br&gt;• Custom alias support&lt;br&gt;• Link expiry (TTL)&lt;br&gt;• Click analytics per link" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=12;spacingTop=8;fillColor=#ffffff;strokeColor=#333333;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="60" y="40" width="330" height="190" as="geometry" />
+        </mxCell>
+        <mxCell id="nfr" value="&lt;b&gt;Non-Functional Requirements&lt;/b&gt;&lt;br&gt;&lt;br&gt;• Scalability (millions of URLs, high concurrency)&lt;br&gt;• Performance (redirect latency &amp;lt; 100 ms)&lt;br&gt;• High availability&lt;br&gt;• Rate limiting (token bucket, IP + device)&lt;br&gt;• Durability (no mapping loss)&lt;br&gt;• Fault tolerance (cache / queue / DB failures)" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=12;spacingTop=8;fillColor=#ffffff;strokeColor=#333333;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="440" y="40" width="400" height="190" as="geometry" />
+        </mxCell>
+
+        <!-- Clients -->
+        <mxCell id="c1" value="Client" style="shape=mxgraph.azure.laptop;html=1;fillColor=#3b7dd8;strokeColor=none;verticalLabelPosition=bottom;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="60" y="440" width="80" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="c2" value="Client" style="shape=mxgraph.azure.laptop;html=1;fillColor=#3b7dd8;strokeColor=none;verticalLabelPosition=bottom;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="60" y="540" width="80" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="c3" value="Client" style="shape=mxgraph.azure.laptop;html=1;fillColor=#3b7dd8;strokeColor=none;verticalLabelPosition=bottom;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="60" y="640" width="80" height="55" as="geometry" />
+        </mxCell>
+
+        <!-- Gateway + LB -->
+        <mxCell id="gw" value="API Gateway&lt;br&gt;(auth + rate limit)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e6f0fb;strokeColor=#3b7dd8;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="200" y="520" width="120" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="lb" value="Load Balancer" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e6f0fb;strokeColor=#3b7dd8;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="370" y="520" width="120" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- Creation cluster -->
+        <mxCell id="cc" value="&lt;b&gt;Creation Service&lt;/b&gt;&lt;br&gt;POST /shorten&lt;br&gt;Base62 ID encoding&lt;br&gt;custom alias check" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dff3e3;strokeColor=#3d9c53;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="580" y="330" width="180" height="90" as="geometry" />
+        </mxCell>
+
+        <!-- Key gen -->
+        <mxCell id="kgs" value="Key Generation Service&lt;br&gt;(pre-generated unique keys)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dff3e3;strokeColor=#3d9c53;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="580" y="200" width="180" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- Redirection cluster -->
+        <mxCell id="rc" value="&lt;b&gt;Redirection Service&lt;/b&gt;&lt;br&gt;GET /{shortcode}&lt;br&gt;returns 302 redirect" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dff3e3;strokeColor=#3d9c53;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="580" y="530" width="180" height="90" as="geometry" />
+        </mxCell>
+
+        <!-- Cache -->
+        <mxCell id="cache" value="Redis Cache&lt;br&gt;(hot URLs, TTL)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fdeaea;strokeColor=#c9433c;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="880" y="530" width="150" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- DB -->
+        <mxCell id="db" value="URL Mapping DB&lt;br&gt;(shortcode → long URL,&lt;br&gt;owner, expiry)&lt;br&gt;read replicas" style="shape=cylinder3;boundedLbl=1;backgroundOutline=1;html=1;whiteSpace=wrap;fillColor=#eeeeee;strokeColor=#666666;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="1130" y="300" width="170" height="130" as="geometry" />
+        </mxCell>
+
+        <!-- Queue -->
+        <mxCell id="mq" value="Message Queue&lt;br&gt;(click events)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff3d6;strokeColor=#d2a02a;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="880" y="720" width="150" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="an" value="Analytics Service&lt;br&gt;(batch aggregation)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff3d6;strokeColor=#d2a02a;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="1130" y="720" width="170" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="andb" value="Analytics Store" style="shape=cylinder3;boundedLbl=1;backgroundOutline=1;html=1;whiteSpace=wrap;fillColor=#eeeeee;strokeColor=#666666;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="1370" y="710" width="140" height="90" as="geometry" />
+        </mxCell>
+
+        <!-- Cleanup -->
+        <mxCell id="cl" value="Cleanup Job&lt;br&gt;(purge expired links,&lt;br&gt;recycle keys)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f0e6fb;strokeColor=#8156c4;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="1370" y="330" width="150" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- Edges -->
+        <mxCell id="e1" style="edgeStyle=orthogonalEdgeStyle;html=1;rounded=1;" edge="1" parent="1" source="c1" target="gw"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e2" style="edgeStyle=orthogonalEdgeStyle;html=1;rounded=1;" edge="1" parent="1" source="c2" target="gw"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e3" style="edgeStyle=orthogonalEdgeStyle;html=1;rounded=1;" edge="1" parent="1" source="c3" target="gw"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e4" style="edgeStyle=orthogonalEdgeStyle;html=1;rounded=1;" edge="1" parent="1" source="gw" target="lb"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e5" value="write path" style="edgeStyle=orthogonalEdgeStyle;html=1;rounded=1;fontSize=11;" edge="1" parent="1" source="lb" target="cc"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e6" value="read path" style="edgeStyle=orthogonalEdgeStyle;html=1;rounded=1;fontSize=11;" edge="1" parent="1" source="lb" target="rc"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e7" value="get unused key" style="edgeStyle=orthogonalEdgeStyle;html=1;rounded=1;fontSize=11;" edge="1" parent="1" source="cc" target="kgs"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e8" value="store mapping" style="edgeStyle=orthogonalEdgeStyle;html=1;rounded=1;fontSize=11;" edge="1" parent="1" source="cc" target="db"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e9" value="lookup shortcode" style="edgeStyle=orthogonalEdgeStyle;html=1;rounded=1;fontSize=11;" edge="1" parent="1" source="rc" target="cache"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e10" value="cache miss → query + backfill" style="edgeStyle=orthogonalEdgeStyle;html=1;rounded=1;fontSize=11;" edge="1" parent="1" source="cache" target="db"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e11" value="publish click event" style="edgeStyle=orthogonalEdgeStyle;html=1;rounded=1;fontSize=11;" edge="1" parent="1" source="rc" target="mq"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e12" style="edgeStyle=orthogonalEdgeStyle;html=1;rounded=1;" edge="1" parent="1" source="mq" target="an"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e13" style="edgeStyle=orthogonalEdgeStyle;html=1;rounded=1;" edge="1" parent="1" source="an" target="andb"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e14" value="scan expired" style="edgeStyle=orthogonalEdgeStyle;html=1;rounded=1;fontSize=11;dashed=1;" edge="1" parent="1" source="cl" target="db"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e15" value="recycle keys" style="edgeStyle=orthogonalEdgeStyle;html=1;rounded=1;fontSize=11;dashed=1;" edge="1" parent="1" source="cl" target="kgs"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
